@@ -16,7 +16,7 @@ import { doc, deleteDoc } from "firebase/firestore";
 import { getDb } from "./services/db";
 import { findAllUsers } from "./services/users.js";
 import { findAllEvents } from "./services/events.js";
-import { findAllLogs } from "./services/logs.js";
+
 // Components import
 import UserSelect from "./components/UserSelect";
 import EventSelect from "./components/EventSelect";
@@ -29,9 +29,7 @@ const App = () => {
   const [timeType, setTimeType] = useState(null);
 
   const [events, users] = GetMyData();
-  const logs = GetMyLogs();
 
-  console.log("logs:", logs);
   console.log("events:", events);
   console.log("users:", users);
 
@@ -57,7 +55,6 @@ const App = () => {
           )}
           {userSelection && (
             <LogTable
-              logs={logs}
               users={users}
               events={events}
               userSelection={userSelection}
@@ -67,23 +64,6 @@ const App = () => {
       </Card>
     </div>
   );
-};
-
-const GetMyLogs = () => {
-  const [logs, setLogs] = useState(null);
-  const [loadingLogs, setLoadingLogs] = useState(false);
-
-  async function getLogs() {
-    setLoadingLogs(true);
-    const response = await findAllLogs();
-    setLogs([...response]);
-    setLoadingLogs(false);
-  }
-  useEffect(() => {
-    getLogs();
-  },[]);
-
-  return logs;
 };
 
 const GetMyData = () => {

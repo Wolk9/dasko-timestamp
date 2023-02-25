@@ -1,23 +1,33 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { getFirestore, doc, deleteDoc } from "firebase/firestore";
+import { findAllLogs } from "../services/logs";
 import { Card } from "primereact/card";
-import { useState } from "react";
 import { getDb } from "../services/db";
 
 const LogTable = (props) => {
-  const { setLogs, logs, users, events, userSelection, eventSelection } = props;
-  const [selectedLog, setSelectedLog] = useState(null);
+  const { users, events, userSelection, eventSelection } = props;
+  const [selectedLog, setSelectedLog] = useState([]);
   const [toBeDeletedId, setToBeDeletedId] = useState(null);
+  const logs = GetMyLogs(
+    selectedLog,
+    toBeDeletedId,
+    userSelection,
+    eventSelection
+  );
+
+  console.log("logs:", logs);
   console.log("LogTable props: ", props);
 
+  if (!logs) return [];
+
   const selectedLogs = logs.filter((log) => {
-    return log.userId == userSelection;
+    return log.userId === userSelection;
   });
 
   const selectedUser = users.filter((user) => {
-    return user.userId == userSelection;
+    return user.userId === userSelection;
   });
 
   const timeDate = (timestamp) => {
@@ -73,13 +83,13 @@ const LogTable = (props) => {
   };
 
   const eventBodyTemplate = (rowData) => {
-    return events.find((x) => x.eventId == rowData.eventId).eventType;
+    return events.find((x) => x.eventId === rowData.eventId).eventType;
   };
 
   const deleteBodyTemplate = (rowData) => {
     return (
       <div
-        onMouseDown={() => {
+        onClick={() => {
           deleteLog(rowData.id);
         }}
       >
@@ -98,6 +108,28 @@ const LogTable = (props) => {
       </DataTable>
     </Card>
   );
+};
+
+const GetMyLogs = (
+  toBeDeletedId,
+  selectedLog,
+  userSelection,
+  eventSelection
+) => {
+  const [logs, setLogs] = useState(null);
+  const [loadingLogs, setLoadingLogs] = useState(false);
+
+  async function getLogs() {
+    setLoadingLogs(true);
+    const response = await findAllLogs();
+    setLogs([...response]);
+    setLoadingLogs(false);
+  }
+  useEffect(() => {
+    getLogs();
+  }, [toBeDeletedId, selectedLog, userSelection, eventSelection]);
+
+  return logs;
 };
 
 export default LogTable;

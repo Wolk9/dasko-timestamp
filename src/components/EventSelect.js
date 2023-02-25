@@ -25,6 +25,7 @@ const EventSelect = (props) => {
   // };
   // Saves a new message to Cloud Firestore.
   async function saveEvent(eventId) {
+    setEventSelection(eventId);
     // Add a new message entry to the Firebase database.
     try {
       await addDoc(collection(getFirestore(), "logs"), {
@@ -32,10 +33,11 @@ const EventSelect = (props) => {
         eventId: eventId,
         timestamp: serverTimestamp(),
       });
-      setEventSelection(eventId);
+
       console.log(
         `writing new message ${eventId} to Firebase Database succeded`
       );
+      setEventSelection(null);
     } catch (error) {
       console.error("Error writing new message to Firebase Database", error);
     }
@@ -59,7 +61,7 @@ const EventSelect = (props) => {
 
   return (
     <div>
-      {!eventSelection ? (
+      {/* {!eventSelection ? (
         <h3>no event selected</h3>
       ) : (
         <h3>
@@ -67,7 +69,7 @@ const EventSelect = (props) => {
           {events.find((event) => event.eventId === eventSelection).eventType}{" "}
           is selected
         </h3>
-      )}
+      )} */}
       <SelectedButton />
     </div>
   );
