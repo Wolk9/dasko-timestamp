@@ -4,21 +4,13 @@ import { Column } from "primereact/column";
 import { getFirestore, doc, deleteDoc } from "firebase/firestore";
 import { Card } from "primereact/card";
 import { useState } from "react";
+import { getDb } from "../services/db";
 
 const LogTable = (props) => {
-  const {
-    setLogs,
-    setLoadingLogs,
-    deleteEvent,
-    logs,
-    users,
-    events,
-    userSelection,
-    eventSelection,
-  } = props;
+  const { setLogs, logs, users, events, userSelection, eventSelection } = props;
   const [selectedLog, setSelectedLog] = useState(null);
+  const [toBeDeletedId, setToBeDeletedId] = useState(null);
   console.log("LogTable props: ", props);
-
 
   const selectedLogs = logs.filter((log) => {
     return log.userId == userSelection;
@@ -57,6 +49,21 @@ const LogTable = (props) => {
     selectedUser
   );
 
+  const deleteLog = (e) => {
+    console.log("Clicked delete for:", e);
+
+    const docRef = doc(getDb(), "logs", e);
+
+    deleteDoc(docRef)
+      .then(() => {
+        setToBeDeletedId(e);
+        console.log("Entire Document has been deleted successfully.");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   // selectedLogs.map(
   //   (x, i) => (x[i].timestamp.seconds = timeDate(x[i].timestamp))
   // );
@@ -73,7 +80,7 @@ const LogTable = (props) => {
     return (
       <div
         onMouseDown={() => {
-          deleteEvent(rowData.id);
+          deleteLog(rowData.id);
         }}
       >
         <i className="pi pi-delete-left" style={{ color: "red" }}></i>
@@ -84,7 +91,7 @@ const LogTable = (props) => {
   return (
     <Card title={selectedUser[0].firstName}>
       <DataTable value={selectedLogs} dataKey="id">
-        // onClick={(e) => deleteEvent(e.event.id)}
+        {/* // onClick={(e) => DeleteEvent(e.event.id)} */}
         <Column header="begin/einde" body={eventBodyTemplate}></Column>
         <Column header="datum/tijd" body={stampBodyTemplate}></Column>
         <Column body={deleteBodyTemplate}></Column>

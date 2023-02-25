@@ -1,6 +1,8 @@
 import React from "react";
 import { Button, DataTable } from "primereact/button";
 
+
+
 const EventLog = (props) => {
   const { selection, timeType, setTimeType, logs, setLogs } = props;
 
