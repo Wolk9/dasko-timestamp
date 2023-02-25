@@ -9,6 +9,7 @@ import "primeicons/primeicons.css";
 import "primeflex/primeflex.css";
 import { Menubar } from "primereact/menubar";
 import { Card } from "primereact/card";
+import { Button } from "primereact/button";
 
 // firebase imports
 import { doc, deleteDoc } from "firebase/firestore";
@@ -27,50 +28,68 @@ const App = () => {
   const [showUserTable] = useState(false);
   const [timeType, setTimeType] = useState(null);
 
-  const [logs, events, users] = GetMyData();
+  const [events, users] = GetMyData();
+  const logs = GetMyLogs();
 
   console.log("logs:", logs);
   console.log("events:", events);
   console.log("users:", users);
 
+  if (!users) return [];
+
   return (
     <div>
       <Menubar className="bg-blue-200" start={"DASKO Timestamp"} />
       <Card>
-        <UserSelect
-          userSelection={userSelection}
-          setUserSelection={setUserSelection}
-          users={users}
-        />
-        {userSelection && (
-          <EventSelect
-            eventSelection={eventSelection}
-            setEventSelection={setEventSelection}
-            events={events}
-            userSelection={userSelection}
-          />
-        )}
-        {userSelection && (
-          <LogTable
-            logs={logs}
+        <div>
+          <UserSelect
             users={users}
-            events={events}
             userSelection={userSelection}
+            setUserSelection={setUserSelection}
           />
-        )}
+          {userSelection && (
+            <EventSelect
+              eventSelection={eventSelection}
+              setEventSelection={setEventSelection}
+              events={events}
+              userSelection={userSelection}
+            />
+          )}
+          {userSelection && (
+            <LogTable
+              logs={logs}
+              users={users}
+              events={events}
+              userSelection={userSelection}
+            />
+          )}
+        </div>
       </Card>
     </div>
   );
 };
 
+const GetMyLogs = () => {
+  const [logs, setLogs] = useState(null);
+  const [loadingLogs, setLoadingLogs] = useState(false);
 
+  async function getLogs() {
+    setLoadingLogs(true);
+    const response = await findAllLogs();
+    setLogs([...response]);
+    setLoadingLogs(false);
+  }
+  useEffect(() => {
+    getLogs();
+  },[]);
+
+  return logs;
+};
 
 const GetMyData = () => {
   const [users, setUsers] = useState(null);
-  const [logs, setLogs] = useState(null);
   const [events, setEvents] = useState(null);
   const [loadingUsers, setLoadingUsers] = useState(false);
-  const [loadingLogs, setLoadingLogs] = useState(false);
   const [loadingEvents, setLoadingEvents] = useState(false);
 
   async function getUsers() {
@@ -86,22 +105,15 @@ const GetMyData = () => {
     setEvents([...response]);
     setLoadingEvents(false);
   }
-  async function getLogs() {
-    setLoadingLogs(true);
-    const response = await findAllLogs();
-    setLogs([...response]);
-    setLoadingLogs(false);
-  }
 
   useEffect(() => {
     getUsers();
     getEvents();
-    getLogs();
   }, []);
 
-  console.log(users, events, logs);
+  console.log(users, events);
 
-  return [logs, events, users];
+  return [events, users];
 };
 
 export default App;
