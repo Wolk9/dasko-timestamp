@@ -37,31 +37,31 @@ const LogTable = (props) => {
 
   const lastLog = selectedLogs[selectedLogs.length - 1];
 
-  const calculateTimePassed = () => {
-    let seconds = new Date();
-    let difference = +new Date() - +new Date(lastLog.timestamp.seconds);
+  // const calculateTimePassed = () => {
+  //   let seconds = new Date();
+  //   let difference = +new Date() - +new Date(lastLog.timestamp.seconds);
 
-    let timePassed = {};
+  //   let timePassed = {};
 
-    console.log(difference);
+  //   console.log(difference);
 
-    if (difference > 0) {
-      timePassed = {
-        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-        minutes: Math.floor((difference / 1000 / 60) % 60),
-        seconds: Math.floor((difference / 1000) % 60),
-      };
-    }
+  //   if (difference > 0) {
+  //     timePassed = {
+  //       days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+  //       hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+  //       minutes: Math.floor((difference / 1000 / 60) % 60),
+  //       seconds: Math.floor((difference / 1000) % 60),
+  //     };
+  //   }
 
-    return timePassed;
-  };
+  //   return timePassed;
+  // };
 
-  const timer = setTimeout(() => {
-    setTimePassed(calculateTimePassed());
-  }, 5000);
+  // const timer = setTimeout(() => {
+  //   setTimePassed(calculateTimePassed());
+  // }, 5000);
 
-  console.log("seconden:", timePassed);
+  // console.log("seconden:", timePassed);
 
   const selectedUser = users.filter((user) => {
     return user.userId === userSelection;
