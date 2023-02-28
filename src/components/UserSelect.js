@@ -4,10 +4,7 @@ import { Button } from "primereact/button";
 const UserSelect = (props) => {
   const { userSelection, setUserSelection, users } = props;
 
-
-  console.log("UserSelect props: ", props)
-
-  
+  // console.log("UserSelect props: ", props)
 
   const SelectedButton = () => {
     return (

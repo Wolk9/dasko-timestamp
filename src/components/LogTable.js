@@ -5,9 +5,13 @@ import { getFirestore, doc, deleteDoc } from "firebase/firestore";
 import { findAllLogs } from "../services/logs";
 import { Card } from "primereact/card";
 import { getDb } from "../services/db";
+import EventSelect from "./EventSelect";
+import { useTimer } from "../services/useTimer";
 
 const LogTable = (props) => {
-  const { users, events, userSelection, eventSelection } = props;
+  const { users, events, userSelection, eventSelection, setEventSelection } =
+    props;
+  const [timePassed, setTimePassed] = useState(0);
   const [selectedLog, setSelectedLog] = useState([]);
   const [toBeDeletedId, setToBeDeletedId] = useState(null);
   const logs = GetMyLogs(
@@ -17,14 +21,47 @@ const LogTable = (props) => {
     eventSelection
   );
 
-  console.log("logs:", logs);
-  console.log("LogTable props: ", props);
+  // console.log("logs:", logs);
+  // console.log("LogTable props: ", props);
 
   if (!logs) return [];
 
   const selectedLogs = logs.filter((log) => {
     return log.userId === userSelection;
   });
+
+  // sort by value
+  selectedLogs.sort((a, b) => a.timestamp - b.timestamp);
+
+  console.log(selectedLogs);
+
+  const lastLog = selectedLogs[selectedLogs.length - 1];
+
+  const calculateTimePassed = () => {
+    let seconds = new Date();
+    let difference = +new Date() - +new Date(lastLog.timestamp.seconds);
+
+    let timePassed = {};
+
+    console.log(difference);
+
+    if (difference > 0) {
+      timePassed = {
+        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((difference / 1000 / 60) % 60),
+        seconds: Math.floor((difference / 1000) % 60),
+      };
+    }
+
+    return timePassed;
+  };
+
+  const timer = setTimeout(() => {
+    setTimePassed(calculateTimePassed());
+  }, 5000);
+
+  console.log("seconden:", timePassed);
 
   const selectedUser = users.filter((user) => {
     return user.userId === userSelection;
@@ -33,7 +70,7 @@ const LogTable = (props) => {
   const timeDate = (timestamp) => {
     let stampObj = timestamp.toDate();
 
-    // console.log(timestamp.seconds, stampObj);
+    //console.log(timestamp.seconds, timestamp, stampObj);
 
     let day = stampObj.getDate();
     let month = stampObj.getMonth() + 1;
@@ -44,33 +81,33 @@ const LogTable = (props) => {
     return `${day}-${month}-${year} ${hour}:${minutes}`;
   };
 
-  console.log(
-    "1 events:",
-    events,
-    "logs:",
-    logs,
-    "users:",
-    users,
-    "userSelection:",
-    userSelection,
-    "selectedLogs:",
-    selectedLogs.timestamp,
-    "selectedUser",
-    selectedUser
-  );
+  // console.log(
+  //   "1 events:",
+  //   events,
+  //   "logs:",
+  //   logs,
+  //   "users:",
+  //   users,
+  //   "userSelection:",
+  //   userSelection,
+  //   "selectedLogs:",
+  //   selectedLogs.timestamp,
+  //   "selectedUser",
+  //   selectedUser
+  // );
 
   const deleteLog = (e) => {
-    console.log("Clicked delete for:", e);
+    // console.log("Clicked delete for:", e);
 
     const docRef = doc(getDb(), "logs", e);
 
     deleteDoc(docRef)
       .then(() => {
         setToBeDeletedId(e);
-        console.log("Entire Document has been deleted successfully.");
+        // console.log("Entire Document has been deleted successfully.");
       })
       .catch((error) => {
-        console.log(error);
+        // console.log(error);
       });
   };
 
@@ -99,14 +136,35 @@ const LogTable = (props) => {
   };
 
   return (
-    <Card title={selectedUser[0].firstName}>
-      <DataTable value={selectedLogs} dataKey="id">
-        {/* // onClick={(e) => DeleteEvent(e.event.id)} */}
-        <Column header="begin/einde" body={eventBodyTemplate}></Column>
-        <Column header="datum/tijd" body={stampBodyTemplate}></Column>
-        <Column body={deleteBodyTemplate}></Column>
-      </DataTable>
-    </Card>
+    <div>
+      <Card>
+        {userSelection && (
+          <EventSelect
+            lastLog={lastLog}
+            eventSelection={eventSelection}
+            setEventSelection={setEventSelection}
+            events={events}
+            userSelection={userSelection}
+          />
+        )}
+      </Card>
+      <Card title={selectedUser[0].firstName}>
+        <DataTable value={selectedLogs} dataKey="id">
+          {/* // onClick={(e) => DeleteEvent(e.event.id)} */}
+          <Column
+            field="eventId"
+            header="begin/einde"
+            body={eventBodyTemplate}
+          ></Column>
+          <Column
+            field="timestamp"
+            header="datum/tijd"
+            body={stampBodyTemplate}
+          ></Column>
+          <Column body={deleteBodyTemplate}></Column>
+        </DataTable>
+      </Card>
+    </div>
   );
 };
 
@@ -127,7 +185,7 @@ const GetMyLogs = (
   }
   useEffect(() => {
     getLogs();
-    console.log("useEffect getLogs");
+    // console.log("useEffect getLogs");
   }, [toBeDeletedId, selectedLog, userSelection, eventSelection]);
 
   return logs;

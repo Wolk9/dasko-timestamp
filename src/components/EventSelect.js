@@ -14,19 +14,21 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 
+
 const EventSelect = (props) => {
-  const { eventSelection, setEventSelection, events, userSelection } = props;
-  console.log("EventSelect props: ", props);
+  const { lastLog, eventSelection, setEventSelection, events, userSelection } =
+    props;
+  // console.log("EventSelect props: ", props);
 
   // const handleClickButton = (e) => {
-  //   console.log("clicked!", e);
+  //   // console.log("clicked!", e);
   //   setEventSelection(e.eventId);
   //   saveEvent();
   // };
   // Saves a new message to Cloud Firestore.
 
   const saveEvent = (eventId) => {
-    console.log("saved: ", eventId);
+    // console.log("saved: ", eventId);
     addDoc(collection(getFirestore(), "logs"), {
       userId: userSelection,
       eventId: eventId,
@@ -34,7 +36,7 @@ const EventSelect = (props) => {
     })
       .then(() => {
         setEventSelection(eventId);
-        console.log("event added succesfully");
+        // console.log("event added succesfully");
       })
       .catch((error) => {
         console.error("Error writing new message to Firebase Database", error);
@@ -44,15 +46,19 @@ const EventSelect = (props) => {
   const SelectedButton = () => {
     return (
       <div>
-        {events.map((event) => (
+        {lastLog === undefined || lastLog.eventId !== 1 ? (
           <Button
-            label={event.eventType}
-            key={event.id}
-            severity={eventSelection !== event.eventId ? "" : "success"}
-            outlined={eventSelection !== event.eventId}
-            onClick={() => saveEvent(event.eventId)}
+            label="begin dienst"
+            severity="success"
+            onClick={() => saveEvent(1)}
           />
-        ))}
+        ) : (
+          <Button
+            label="eindig dienst"
+            severity="danger"
+            onClick={() => saveEvent(2)}
+          />
+        )}
       </div>
     );
   };

@@ -1,17 +1,15 @@
 import React from "react";
 import { Button, DataTable } from "primereact/button";
 
-
-
 const EventLog = (props) => {
   const { selection, timeType, setTimeType, logs, setLogs } = props;
 
   const timeTypes = [
     { id: 1, tag: "begin", label: "Begin dienst" },
-    { id: 2, tag: "einde", label: "Einde dienst" }
+    { id: 2, tag: "einde", label: "Einde dienst" },
   ];
 
-  console.log(props);
+  // console.log(props);
 
   const handleButtonClick = (type) => {
     setTimeType(type.id);

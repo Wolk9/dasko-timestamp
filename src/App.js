@@ -19,7 +19,6 @@ import { findAllEvents } from "./services/events.js";
 
 // Components import
 import UserSelect from "./components/UserSelect";
-import EventSelect from "./components/EventSelect";
 import LogTable from "./components/LogTable";
 
 const App = () => {
@@ -30,8 +29,8 @@ const App = () => {
 
   const [events, users] = GetMyData();
 
-  console.log("events:", events);
-  console.log("users:", users);
+  // console.log("events:", events);
+  // console.log("users:", users);
 
   if (!users) return [];
 
@@ -46,15 +45,9 @@ const App = () => {
             setUserSelection={setUserSelection}
           />
           {userSelection && (
-            <EventSelect
+            <LogTable
               eventSelection={eventSelection}
               setEventSelection={setEventSelection}
-              events={events}
-              userSelection={userSelection}
-            />
-          )}
-          {userSelection && (
-            <LogTable
               users={users}
               events={events}
               userSelection={userSelection}
@@ -77,7 +70,7 @@ const GetMyData = () => {
     const response = await findAllUsers();
     setUsers([...response]);
     setLoadingUsers(false);
-    console.log(response);
+    // console.log(response);
   }
   async function getEvents() {
     setLoadingEvents(true);
@@ -91,7 +84,7 @@ const GetMyData = () => {
     getEvents();
   }, []);
 
-  console.log(users, events);
+  // console.log(users, events);
 
   return [events, users];
 };
