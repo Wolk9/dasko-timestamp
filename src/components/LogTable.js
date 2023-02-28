@@ -127,6 +127,7 @@ const GetMyLogs = (
   }
   useEffect(() => {
     getLogs();
+    console.log("useEffect getLogs");
   }, [toBeDeletedId, selectedLog, userSelection, eventSelection]);
 
   return logs;
