@@ -21,6 +21,14 @@ const LogTable = (props) => {
     eventSelection
   );
 
+  
+
+     let h = hours < 10 ? “0” + hours : hours;
+    let m = minutes < 10 ? “0” + minutes : minutes;
+    let s = seconds < 10 ? “0” + seconds : seconds;
+
+
+
   // console.log("logs:", logs);
   // console.log("LogTable props: ", props);
 
@@ -36,32 +44,6 @@ const LogTable = (props) => {
   console.log(selectedLogs);
 
   const lastLog = selectedLogs[selectedLogs.length - 1];
-
-  // const calculateTimePassed = () => {
-  //   let seconds = new Date();
-  //   let difference = +new Date() - +new Date(lastLog.timestamp.seconds);
-
-  //   let timePassed = {};
-
-  //   console.log(difference);
-
-  //   if (difference > 0) {
-  //     timePassed = {
-  //       days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-  //       hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-  //       minutes: Math.floor((difference / 1000 / 60) % 60),
-  //       seconds: Math.floor((difference / 1000) % 60),
-  //     };
-  //   }
-
-  //   return timePassed;
-  // };
-
-  // const timer = setTimeout(() => {
-  //   setTimePassed(calculateTimePassed());
-  // }, 5000);
-
-  // console.log("seconden:", timePassed);
 
   const selectedUser = users.filter((user) => {
     return user.userId === userSelection;
