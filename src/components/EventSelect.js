@@ -4,23 +4,23 @@ import {
   getFirestore,
   collection,
   addDoc,
-  query,
-  orderBy,
-  limit,
-  onSnapshot,
-  setDoc,
-  updateDoc,
-  doc,
   serverTimestamp,
 } from "firebase/firestore";
-import { beginTimer, endTimer } from "../services/stopwatch";
 
 const EventSelect = (props) => {
-  const { lastLog, eventSelection, setEventSelection, events, userSelection } =
+  const { handleStart, handleStop, lastLog, setEventSelection, userSelection } =
     props;
 
+  const start = () => {
+    handleStart();
+  };
+
+  const stop = () => {
+    handleStop();
+  };
+
   const saveEvent = (eventId) => {
-    //lastLog === undefined || lastLog.eventId !== 1 ? beginTimer() : endTimer();
+    lastLog === undefined || lastLog.eventId !== 1 ? start() : stop();
     addDoc(collection(getFirestore(), "logs"), {
       userId: userSelection,
       eventId: eventId,

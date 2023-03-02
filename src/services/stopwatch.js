@@ -1,30 +1,34 @@
-let [milliseconds, seconds, minutes, hours] = [0, 0, 0, 0];
-let int = null;
+import { useState, useRef } from "react";
 
+export default function Stopwatch() {
+  const [startTime, setStartTime] = useState(null);
+  const [now, setNow] = useState(null);
+  const intervalRef = useRef(null);
 
-export const beginTimer = () => {
-        if (int !== null) {
-            clearInterval(int);
-        }
-        int = setInterval(displayTimer, 10);
-    };
+  function handleStart() {
+    setStartTime(Date.now());
+    setNow(Date.now());
 
-export const endTimer = () => {
-        clearInterval(int);
-        [milliseconds, seconds, minutes, hours] = [0, 0, 0, 0];
-};
+    clearInterval(intervalRef.current);
+    intervalRef.current = setInterval(() => {
+      setNow(Date.now());
+    }, 10);
+  }
 
-export const displayTimer = () => {
-    seconds++;
-    if (seconds == 60) {
-        seconds = 0;
-        minutes++;
-        if (minutes == 60) {
-            minutes = 0;
-            hours++;
-        }
-    }
-    return [seconds, minutes, hours]
-};
-        
- 
+  function handleStop() {
+    clearInterval(intervalRef.current);
+  }
+
+  let secondsPassed = 0;
+  if (startTime != null && now != null) {
+    secondsPassed = (now - startTime) / 1000;
+  }
+
+  return (
+    <>
+      <h1>Time passed: {secondsPassed.toFixed(3)}</h1>
+      <button onClick={handleStart}>Start</button>
+      <button onClick={handleStop}>Stop</button>
+    </>
+  );
+}
