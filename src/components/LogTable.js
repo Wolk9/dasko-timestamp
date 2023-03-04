@@ -1,17 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { getFirestore, doc, deleteDoc } from "firebase/firestore";
+import { doc, deleteDoc } from "firebase/firestore";
 import { findAllLogs } from "../services/logs";
 import { Card } from "primereact/card";
 import { getDb } from "../services/db";
 import EventSelect from "./EventSelect";
-import { useTimer } from "../services/useTimer";
 
 const LogTable = (props) => {
-  const { users, events, userSelection, eventSelection, setEventSelection } =
-    props;
-  const [timePassed, setTimePassed] = useState(0);
+  const {
+    handleStart,
+    handleStop,
+    users,
+    events,
+    userSelection,
+    eventSelection,
+    setEventSelection,
+  } = props;
+  // eslint-disable-next-line
   const [selectedLog, setSelectedLog] = useState([]);
   const [toBeDeletedId, setToBeDeletedId] = useState(null);
   const logs = GetMyLogs(
@@ -20,9 +26,6 @@ const LogTable = (props) => {
     userSelection,
     eventSelection
   );
-
-  // console.log("logs:", logs);
-  // console.log("LogTable props: ", props);
 
   if (!logs) return [];
 
@@ -37,37 +40,11 @@ const LogTable = (props) => {
 
   const lastLog = selectedLogs[selectedLogs.length - 1];
 
-  // const calculateTimePassed = () => {
-  //   let seconds = new Date();
-  //   let difference = +new Date() - +new Date(lastLog.timestamp.seconds);
-
-  //   let timePassed = {};
-
-  //   console.log(difference);
-
-  //   if (difference > 0) {
-  //     timePassed = {
-  //       days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-  //       hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-  //       minutes: Math.floor((difference / 1000 / 60) % 60),
-  //       seconds: Math.floor((difference / 1000) % 60),
-  //     };
-  //   }
-
-  //   return timePassed;
-  // };
-
-  // const timer = setTimeout(() => {
-  //   setTimePassed(calculateTimePassed());
-  // }, 5000);
-
-  // console.log("seconden:", timePassed);
-
   const selectedUser = users.filter((user) => {
     return user.userId === userSelection;
   });
 
-  const timeDate = (timestamp) => {
+  const timeStampDateTime = (timestamp) => {
     let stampObj = timestamp.toDate();
 
     //console.log(timestamp.seconds, timestamp, stampObj);
@@ -78,23 +55,11 @@ const LogTable = (props) => {
     let hour = stampObj.getHours();
     let minutes = stampObj.getMinutes();
 
-    return `${day}-${month}-${year} ${hour}:${minutes}`;
-  };
+    let h = hour < 10 ? "0" + hour : hour;
+    let m = minutes < 10 ? "0" + minutes : minutes;
 
-  // console.log(
-  //   "1 events:",
-  //   events,
-  //   "logs:",
-  //   logs,
-  //   "users:",
-  //   users,
-  //   "userSelection:",
-  //   userSelection,
-  //   "selectedLogs:",
-  //   selectedLogs.timestamp,
-  //   "selectedUser",
-  //   selectedUser
-  // );
+    return `${day}-${month}-${year} ${h}:${m}`;
+  };
 
   const deleteLog = (e) => {
     // console.log("Clicked delete for:", e);
@@ -112,11 +77,11 @@ const LogTable = (props) => {
   };
 
   // selectedLogs.map(
-  //   (x, i) => (x[i].timestamp.seconds = timeDate(x[i].timestamp))
+  //   (x, i) => (x[i].timestamp.seconds = timeStampDateTime(x[i].timestamp))
   // );
 
   const stampBodyTemplate = (rowData) => {
-    return timeDate(rowData.timestamp);
+    return timeStampDateTime(rowData.timestamp);
   };
 
   const eventBodyTemplate = (rowData) => {
@@ -140,6 +105,8 @@ const LogTable = (props) => {
       <Card>
         {userSelection && (
           <EventSelect
+            handleStart={handleStart}
+            handleStop={handleStop}
             lastLog={lastLog}
             eventSelection={eventSelection}
             setEventSelection={setEventSelection}
@@ -175,6 +142,7 @@ const GetMyLogs = (
   eventSelection
 ) => {
   const [logs, setLogs] = useState(null);
+  // eslint-disable-next-line
   const [loadingLogs, setLoadingLogs] = useState(false);
 
   async function getLogs() {

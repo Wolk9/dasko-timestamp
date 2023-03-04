@@ -4,31 +4,23 @@ import {
   getFirestore,
   collection,
   addDoc,
-  query,
-  orderBy,
-  limit,
-  onSnapshot,
-  setDoc,
-  updateDoc,
-  doc,
   serverTimestamp,
 } from "firebase/firestore";
 
-
 const EventSelect = (props) => {
-  const { lastLog, eventSelection, setEventSelection, events, userSelection } =
+  const { handleStart, handleStop, lastLog, setEventSelection, userSelection } =
     props;
-  // console.log("EventSelect props: ", props);
 
-  // const handleClickButton = (e) => {
-  //   // console.log("clicked!", e);
-  //   setEventSelection(e.eventId);
-  //   saveEvent();
-  // };
-  // Saves a new message to Cloud Firestore.
+  const start = () => {
+    handleStart();
+  };
+
+  const stop = () => {
+    handleStop();
+  };
 
   const saveEvent = (eventId) => {
-    // console.log("saved: ", eventId);
+    lastLog === undefined || lastLog.eventId !== 1 ? start() : stop();
     addDoc(collection(getFirestore(), "logs"), {
       userId: userSelection,
       eventId: eventId,
@@ -65,15 +57,6 @@ const EventSelect = (props) => {
 
   return (
     <div>
-      {/* {!eventSelection ? (
-        <h3>no event selected</h3>
-      ) : (
-        <h3>
-          Event{" "}
-          {events.find((event) => event.eventId === eventSelection).eventType}{" "}
-          is selected
-        </h3>
-      )} */}
       <SelectedButton />
     </div>
   );

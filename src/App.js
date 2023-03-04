@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 
 //theme primereact
 import "primereact/resources/themes/tailwind-light/theme.css";
@@ -20,23 +20,59 @@ import { findAllEvents } from "./services/events.js";
 // Components import
 import UserSelect from "./components/UserSelect";
 import LogTable from "./components/LogTable";
+import { hasFormSubmit } from "@testing-library/user-event/dist/utils";
+import Stopwatch from "./services/stopwatch";
 
 const App = () => {
   const [userSelection, setUserSelection] = useState(null);
   const [eventSelection, setEventSelection] = useState(null);
   const [showUserTable] = useState(false);
   const [timeType, setTimeType] = useState(null);
-
   const [events, users] = GetMyData();
 
-  // console.log("events:", events);
-  // console.log("users:", users);
+  // stopwatch
+  const [startTime, setStartTime] = useState(null);
+  const [now, setNow] = useState(null);
+  const intervalRef = useRef(null);
+
+  const handleStart = () => {
+    setStartTime(Date.now());
+    setNow(Date.now());
+
+    clearInterval(intervalRef.current);
+    intervalRef.current = setInterval(() => {
+      setNow(Date.now());
+    }, 10);
+  };
+
+  const handleStop = () => {
+    clearInterval(intervalRef.current);
+  };
+
+  let secondsPassed = 0;
+  let minutesPassed = 0;
+  let hoursPassed = 0;
+  if (startTime != null && now != null) {
+    secondsPassed = (now - startTime) / 1000;
+    if (secondsPassed === 60) {
+      secondsPassed = 0;
+      minutesPassed++;
+      if (minutesPassed === 60) {
+        minutesPassed = 0;
+        hoursPassed++;
+      }
+    }
+  }
+
+  let h = hoursPassed < 10 ? "0" + hoursPassed : hoursPassed;
+  let m = minutesPassed < 10 ? "0" + minutesPassed : minutesPassed;
+  let s = secondsPassed < 10 ? "0" + secondsPassed : secondsPassed;
 
   if (!users) return [];
 
   return (
     <div>
-      <Menubar className="bg-blue-200" start={"DASKO Timestamp"} />
+      <Menubar className="bg-blue-600" start={"DASKO Timestamp"} />
       <Card>
         <div>
           <UserSelect
@@ -44,8 +80,13 @@ const App = () => {
             userSelection={userSelection}
             setUserSelection={setUserSelection}
           />
+          <div>
+            <Stopwatch h={h} m={m} s={s} />
+          </div>
           {userSelection && (
             <LogTable
+              handleStart={handleStart()}
+              handleStop={handleStop()}
               eventSelection={eventSelection}
               setEventSelection={setEventSelection}
               users={users}
