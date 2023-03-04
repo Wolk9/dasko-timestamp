@@ -21,6 +21,7 @@ import { findAllEvents } from "./services/events.js";
 import UserSelect from "./components/UserSelect";
 import LogTable from "./components/LogTable";
 import { hasFormSubmit } from "@testing-library/user-event/dist/utils";
+import Stopwatch from "./services/stopwatch";
 
 const App = () => {
   const [userSelection, setUserSelection] = useState(null);
@@ -34,7 +35,7 @@ const App = () => {
   const [now, setNow] = useState(null);
   const intervalRef = useRef(null);
 
-  function handleStart() {
+  const handleStart = () => {
     setStartTime(Date.now());
     setNow(Date.now());
 
@@ -42,11 +43,11 @@ const App = () => {
     intervalRef.current = setInterval(() => {
       setNow(Date.now());
     }, 10);
-  }
+  };
 
-  function handleStop() {
+  const handleStop = () => {
     clearInterval(intervalRef.current);
-  }
+  };
 
   let secondsPassed = 0;
   let minutesPassed = 0;
@@ -80,7 +81,7 @@ const App = () => {
             setUserSelection={setUserSelection}
           />
           <div>
-            Time passed: {h}:{m}:{s}
+            <Stopwatch h={h} m={m} s={s} />
           </div>
           {userSelection && (
             <LogTable
